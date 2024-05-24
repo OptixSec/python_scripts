@@ -1,6 +1,6 @@
 # Instructions
 
-## Dependancies
+## Dependencies
 
 ```bash
 pip install pytube

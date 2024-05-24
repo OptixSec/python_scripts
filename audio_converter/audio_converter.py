@@ -1,11 +1,19 @@
+#!/usr/bin/python_venv/bin/python
+
 import argparse
 import ffmpeg
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Global variable to hold the default path to directories containing your input files
+MUSIC_PATH = os.getenv("MUSIC_DIR")  # Replace with your default path
+
 
 def convert_to_wav(input_file, output_file):
     try:
-        # Use ffmpeg to convert the file to wav format with the highest quality
         ffmpeg.input(input_file).output(
             output_file, format="wav", acodec="pcm_s16le"
         ).run(overwrite_output=True)
@@ -16,7 +24,6 @@ def convert_to_wav(input_file, output_file):
 
 def convert_to_mp3(input_file, output_file):
     try:
-        # Use ffmpeg to convert the file to mp3 format with the highest quality
         ffmpeg.input(input_file).output(
             output_file, format="mp3", audio_bitrate="320k"
         ).run(overwrite_output=True)
@@ -25,8 +32,9 @@ def convert_to_mp3(input_file, output_file):
         print(f"Error occurred during MP3 conversion: {e}")
 
 
-def convert_files_in_directory(directory, remove_input=False):
-    for root, dirs, files in os.walk(directory):
+def convert_files_in_directory(remove_input=False):
+    global MUSIC_PATH
+    for root, dirs, files in os.walk(MUSIC_PATH):
         for file in files:
             if file.endswith(".mp4") or file.endswith(".webm"):
                 input_file = os.path.join(root, file)
@@ -47,11 +55,15 @@ def convert_files_in_directory(directory, remove_input=False):
 
 
 def main():
+    global MUSIC_PATH
     parser = argparse.ArgumentParser(
         description="Convert .mp4 and .webm files to .mp3 format via .wav."
     )
     parser.add_argument(
-        "directory", help="Path to the directory containing input files"
+        "-d",
+        "--directory",
+        help="Path to the directory containing input files",
+        default=MUSIC_PATH,
     )
     parser.add_argument(
         "-r",
@@ -61,13 +73,13 @@ def main():
     )
     args = parser.parse_args()
 
-    # Validate directory
     if not os.path.isdir(args.directory):
         print(f"Directory {args.directory} does not exist.")
         return
 
-    # Convert files in directory
-    convert_files_in_directory(args.directory, args.remove_input)
+    MUSIC_PATH = args.directory
+
+    convert_files_in_directory(args.remove_input)
 
 
 if __name__ == "__main__":

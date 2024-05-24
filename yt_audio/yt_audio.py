@@ -1,3 +1,5 @@
+#!/usr/bin/python_venv/bin/python
+
 import argparse
 from pytube import YouTube, Playlist
 from tqdm import tqdm
@@ -7,7 +9,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Define the fixed directory to save the audio
-DOWNLOAD_PATH = os.getenv("DL_PATH")
+DOWNLOAD_PATH = os.getenv("MUSIC_DIR")
+
+# Append a subdirectory to DOWNLOAD_PATH
+DOWNLOAD_PATH = os.path.join(DOWNLOAD_PATH, "youtube_downloads")
 
 
 def format_stream_string(input_string):
